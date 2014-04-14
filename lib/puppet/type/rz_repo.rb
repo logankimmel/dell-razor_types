@@ -1,4 +1,4 @@
-require 'puppet/type'
+require 'uri'
 
 Puppet::Type.newtype(:rz_repo) do
   @doc = <<-EOT
@@ -13,17 +13,27 @@ Puppet::Type.newtype(:rz_repo) do
   end
 
   newparam(:url) do
-    desc 'Url to use for repo'
-  end
+    desc 'The repo url address (Deprecated).'
 
-  newparam(:iso_url) do
-    desc 'Location of iso to unpack for razor to serve'
-  end
-
-  validate do
-    if self[:url] and self[:iso_url]
-      raise(Exception, "Cannot specify both url and iso_url")
+    munge do |value|
+      Puppet.warning "rz_repo url parameter deprecated, use iso_url."
+      resource[:iso_url] = value
     end
   end
 
+  newparam(:iso_url) do
+    desc 'The iso url address (file:// or http://)'
+
+    munge do |value|
+      case value
+      when /^http/
+        raise(PuppetError, "Invalid iso_url: #{value}") unless value =~ /^#{URI::regexp}$/
+        value
+      when /^\//
+        "file://#{value}"
+      else
+        raise PuppetError, "Invalid iso_url: #{value}"
+      end
+    end
+  end
 end

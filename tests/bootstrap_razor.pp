@@ -21,7 +21,6 @@ rz_policy { 'Policy_10':
   root_password => 'pass',
   max_count     => 1,
   rule_number   => 10,
-#  tags          => [],
   tags          => [
          {
             "name" => "Tag_10",
@@ -37,10 +36,3 @@ rz_policy { 'Policy_10':
          }
   ],
 }
-
-#
-# this is failing for some reason :(
-#rz_repo { 'repo2':
-#  ensure  => present,
-#  iso_url => '/tmp/foo.iso'
-#}

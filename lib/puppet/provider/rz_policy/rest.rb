@@ -10,11 +10,10 @@ Puppet::Type.type(:rz_policy).provide(
 ) do
 
   def exists?
-    get('policies', resource[:name])
+    @policy = get('policies', resource[:name])
   end
 
   def create
-
     args = {
       'name'          => resource[:name],
       'hostname'      => resource[:hostname],
@@ -24,18 +23,46 @@ Puppet::Type.type(:rz_policy).provide(
       'tags'          => resource[:tags],
       'enabled'       => resource[:enabled]
     }
-    [:repo, :installer, :broker].each do |attr|
+    [:repo, :task, :broker].each do |attr|
       if resource[attr]
         args.merge!({attr.to_s => {'name' => resource[attr] }})
       end
     end
 
     post('create-policy', args)
-
   end
 
   def destroy
-    raise(Exception, "Destroy is not implemented")
+    args = { 'name' => resource[:name] }
+
+    post('delete-policy', args)
+  end
+
+  def enabled
+    @policy['enabled'] ? :true : :false
+  end
+
+  def enabled=(value)
+    args = { 'name' => resource[:name] }
+    if value == :true
+      post('enable-policy', args)
+    else
+      post('disable-policy', args)
+    end
+  end
+
+  def max_count
+    @policy['max_count']
+  end
+
+  def max_count=(value)
+    args = {
+      'name'      => resource[:name],
+      # razor code is not consistent about - vs _
+      'max-count' => resource[:max_count],
+    }
+
+    post('modify-policy-max-count', args)
   end
 
   def tags

@@ -14,19 +14,17 @@ Puppet::Type.type(:rz_repo).provide(
   end
 
   def create
-
     args = {
       'name'          => resource[:name],
       'iso-url'       => resource[:iso_url],
-      'url'           => resource[:url]
     }
 
     post('create-repo', args)
-
   end
 
   def destroy
-    raise(Exception, "Destroy is not implemented")
-  end
+    args = { 'name' => resource[:name] }
 
+    post('delete-repo', args)
+  end
 end
