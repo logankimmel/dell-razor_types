@@ -14,7 +14,6 @@ Puppet::Type.type(:rz_broker).provide(
   end
 
   def create
-
     args = {
       'name'          => resource[:name],
       'configuration' => resource[:configuration],
@@ -22,11 +21,13 @@ Puppet::Type.type(:rz_broker).provide(
     }
 
     post('create-broker', args)
-
   end
 
   def destroy
-    raise(Exception, "destroy is not implemented")
-  end
+    args = {
+      'name' => resource[:name],
+    }
 
+    post('delete-broker', args)
+  end
 end

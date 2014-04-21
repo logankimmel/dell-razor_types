@@ -1,5 +1,3 @@
-require 'puppet/type'
-
 Puppet::Type.newtype(:rz_policy) do
 
   @doc = <<-EOT
@@ -9,12 +7,12 @@ Puppet::Type.newtype(:rz_policy) do
   ensurable
 
   newparam(:name) do
-    desc 'unique name of policy'
+    desc 'razor policy name'
   end
 
-  newparam(:enabled) do
-    desc 'enabled state for policy'
-    newvalues(true, false, 'true', 'false')
+  newproperty(:enabled) do
+    desc 'is the policy enabled'
+    newvalues(:true, :false)
     defaultto(true)
   end
 
@@ -24,6 +22,14 @@ Puppet::Type.newtype(:rz_policy) do
 
   newparam(:installer) do
     desc 'installer to use'
+    munge do |value|
+      Puppet.warning 'rz_policy installer parameter deprecated, use task'
+      resource[:task] = value
+    end
+  end
+
+  newparam(:task) do
+    desc 'task to use'
   end
 
   newparam(:broker) do
@@ -38,7 +44,7 @@ Puppet::Type.newtype(:rz_policy) do
     desc 'root password'
   end
 
-  newparam(:max_count) do
+  newproperty(:max_count) do
     desc 'max count for policy'
     munge do |x|
       Integer(x)
@@ -61,5 +67,4 @@ Puppet::Type.newtype(:rz_policy) do
   autorequire(:rz_broker) do
     self[:broker]
   end
-
 end
