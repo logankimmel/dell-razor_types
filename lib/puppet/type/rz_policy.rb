@@ -14,6 +14,10 @@ Puppet::Type.newtype(:rz_policy) do
     desc 'is the policy enabled'
     newvalues(:true, :false)
     defaultto(true)
+    munge do |value|
+      #This is required so value is a boolean, not just a string. Needed for api
+      value.to_s =='true'
+    end
   end
 
   newparam(:repo) do
@@ -57,7 +61,18 @@ Puppet::Type.newtype(:rz_policy) do
     end
   end
 
-  newproperty(:tags, :array_matching => :all) do
+  newparam(:tags) do
+    #Puppet will convert a single element array to a string, have to munge into an array.
+    munge do |x|
+      !x.is_a?(Array) ? [x] : x
+    end
+  end
+
+  newparam(:node_metadata) do
+    desc 'The node metadata associated with this policy'
+    munge do |x|
+      x.nil? ? {} : x
+    end
   end
 
   autorequire(:rz_repo) do
