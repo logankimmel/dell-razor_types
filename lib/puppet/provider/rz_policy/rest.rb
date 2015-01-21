@@ -34,9 +34,16 @@ Puppet::Type.type(:rz_policy).provide(
   end
 
   def destroy
-    args = { 'name' => resource[:name] }
+    nodes = get('policies', resource[:name], 'nodes')
+    raise(Exception, "Failed to find nodes for #{resource[:name]}") unless nodes
 
-    post('delete-policy', args)
+    nodes['items'].each do |item|
+      Puppet.debug("Reinstalling node #{item['name']}")
+      post('reinstall-node', { 'name' => item['name'] })
+    end
+
+    Puppet.debug("Deleting policy #{resource[:name]}")
+    post('delete-policy', { 'name' => resource[:name] })
   end
 
   def enabled
