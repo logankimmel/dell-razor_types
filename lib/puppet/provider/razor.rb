@@ -3,10 +3,10 @@ require 'tempfile'
 
 class Puppet::Provider::Razor < Puppet::Provider
 
-  def get(type, name)
+  def get(type, name, action = nil)
     begin
       response = RestClient.get(
-        "http://localhost:8080/api/collections/#{type}/#{name}"
+        "http://localhost:8080/api/collections/#{[type, name, action].compact.join('/')}"
       )
     rescue RestClient::ResourceNotFound
       return false
