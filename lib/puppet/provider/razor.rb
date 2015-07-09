@@ -31,12 +31,8 @@ class Puppet::Provider::Razor < Puppet::Provider
   end
 
   def setup_transport
-    if resource[:transport]
-      @transport ||= PuppetX::Puppetlabs::Transport.retrieve(:resource_ref => resource[:transport], :catalog => resource.catalog, :provider => 'razor')
-      @conn = @transport.connect
-    else
-      @conn = RestClient::Resource.new('http://localhost:8080/api')
-    end
+    @transport ||= PuppetX::Puppetlabs::Transport.retrieve(:resource_ref => resource[:transport], :catalog => resource.catalog, :provider => 'razor')
+    @conn = @transport.connect
   end
 
   def post(url, args)
